@@ -49,7 +49,6 @@ exports.run = async (bot, message, args) => {
         "**Jak powtórzyć błąd:** " + reproList +
         "**Końcowy wynik:** " + bugArgs[3] + "\n" +
         "**Informacje systemowe oraz aplikacji:** " + bugArgs[4])
-        .addField("Status", "Oczekuje na potwierdzenie")
         .setTimestamp(new Date());
     bot.guilds.cache.get(process.env.GUILDID).channels.cache.get(api.channels.approvalChannel).send(bugEmbed).then(msg => {
         db.set(`reports.${number}.user`, message.author.id);

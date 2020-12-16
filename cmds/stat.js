@@ -12,7 +12,7 @@ exports.run = async (bot, message, args) => {
     const embed = new Discord.MessageEmbed()
         .setAuthor(bot.user.username,bot.user.displayAvatarURL({type: 'png', size: 64}))
         .setTitle("Twoje statystyki")
-        .setDescription(`Wszystkie wysłane zgłoszenia:\n**${reports}**\n\nZweryfikowane zgłoszenia:\n**${approve}**\n\nOdrzucone zgłoszenia:\n**${reject}**`)
+        .setDescription(`Wszystkie wysłane zgłoszenia:\n**${reports}**\n\nZadelkarował/a występowanie błedu:\n**${approve}**\n\nZadeklarował/a nie występowanie błędu:\n**${reject}**`)
         .setTimestamp(new Date())
         .setColor('GREEN');
     await message.channel.send(embed);
