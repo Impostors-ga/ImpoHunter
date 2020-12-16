@@ -58,17 +58,21 @@ exports.run = async (bot, message, args) => {
 
 
         if(reportCount === 0) {
-            msg.edit(msg.content + "\n\n" +
-                ":-1: **" + message.author.tag + "**:" +
-                "`" + reason[1] + "`"
-
-            );
+            const embed = msg.embeds[0];
+            embed.spliceFields(0, 1);
+            embed.addField("Status", "Odrzucono", true);
+            embed.addField("Weryfikator", message.author.tag, true);
+            embed.setColor("RED")
+            embed.addField("Powód", reason[1]);
+            msg.edit(embed);
         } else {
-            msg.edit(msg.content + "\n" +
-                ":-1: **" + message.author.tag + "**:" +
-                "`" + reason[1] + "`"
-
-            );
+            const embed = msg.embeds[0];
+            embed.spliceFields(0, 1);
+            embed.addField("Status", "Odrzucono", true);
+            embed.addField("Weryfikator", message.author.tag, true);
+            embed.setColor("RED")
+            embed.addField("Powód", reason[1]);
+            msg.edit(embed);
         }
 
         let selfCount = db.fetch(`reports.${number}.rep.count`) || 0;
@@ -82,7 +86,8 @@ exports.run = async (bot, message, args) => {
         db.set(`reports.${number}.reports.${message.author.id}.content`, reason[1]);
         db.set(`reports.${number}.reports.${message.author.id}.rep`, selfCount+1);
         db.set(`reports.${number}.reports.reported.${message.author.id}`, "deny");
-
+        let author_id = db.fetch(`reports.${number}.user`);
+        db.set(`users.${author_id}.reportRejectCount`, db.get(`users.${author_id}.reportRejectCount`)+1);
         const r = await message.reply("To zgłoszenie zostało **odrzucone**!");
         setTimeout(function(){
             r.delete()
