@@ -92,6 +92,8 @@ exports.run = async (bot, message, args) => {
         let approveCount = db.fetch(`reports.${number}.reports.approve.count`);
         let reportStatus = db.fetch(`reports.${number}.status`);
 
+        console.log(approveCount, reportStatus);
+
         if(approveCount >= api.toReport && reportStatus === 0) {
             db.set(`reports.${number}.status`, 1);
             let bugOwner = db.fetch(`reports.${number}.user`);

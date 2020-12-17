@@ -20,7 +20,7 @@ api.enum.status = {
     4: "Błąd znany oraz zgłoszony wcześniej",
 }
 
-api.toReport = 3;
+api.toReport = 2;
 
 api.sendTrello = async (number, user_tag, service, description, reproduce, result, settings) =>  {
     const yourApiKey = process.env.APIKEY;
