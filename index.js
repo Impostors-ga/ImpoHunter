@@ -70,7 +70,6 @@ api.sendTrello = async (number, user_tag, service, description, reproduce, resul
             });
         }
     });
-    console.log(`https://api.trello.com/1/cards?name=${encodeURI(description)}&desc=${encodeURI(bug_all)}&pos=top&idList=${encodeURI(listID)}&keepFromSource=all&key=${encodeURI(yourApiKey)}&token=${encodeURI(yourApiToken)}`);
     xhr.open("POST", `https://api.trello.com/1/cards?name=${encodeURI(description)}&desc=${encodeURI(bug_all)}&pos=top&idList=${encodeURI(listID)}&keepFromSource=all&key=${encodeURI(yourApiKey)}&token=${encodeURI(yourApiToken)}`);
 
     xhr.send(data);
@@ -118,6 +117,14 @@ bot.on("message", msg => {
     if(msg.channel.id !== api.channels.reportChannel && msg.channel.id !== api.channels.approvalChannel && msg.channel.id !== api.channels.logsChannel){ // #boty
         return;
     }
+
+    if(!db.get(`users.${msg.author.id}`)){
+        db.set(`users.${msg.author.id}.reportsCount`, 0);
+        db.set(`users.${msg.author.id}.reportsVerifiedCount`, 0);
+        db.set(`users.${msg.author.id}.reportApproveCount`, 0);
+        db.set(`users.${msg.author.id}.reportRejectCount`, 0);
+    }
+
     if (!msg.content.startsWith(prefix)) return;
     let msgArray = msg.content.split(" ");
     let cmd = msgArray[0].toLocaleLowerCase();

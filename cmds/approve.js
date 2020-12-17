@@ -104,8 +104,6 @@ exports.run = async (bot, message, args) => {
         let approveCount = db.fetch(`reports.${number}.reports.approve.count`);
         let reportStatus = db.fetch(`reports.${number}.status`);
 
-        console.log(approveCount, reportStatus);
-
         if(approveCount >= api.toReport && reportStatus === 0) {
             db.set(`reports.${number}.status`, 1);
             let bugOwner = db.fetch(`reports.${number}.user`);
@@ -121,6 +119,8 @@ exports.run = async (bot, message, args) => {
             let settings = db.fetch(`reports.${number}.settings`);
             let creationTimestamp = db.fetch(`reports.${number}.creationTimestamp`);
             let argTo = Object.keys(db.fetch(`reports.${number}.reports.approve`));
+
+            db.set(`users.${user}.reportsVerifiedCount`, db.get(`users.${user}.reportsVerifiedCount`)+1);
 
             await api.sendTrello(number, user_tag, service, description, reproduce, result, settings);
 
@@ -160,25 +160,37 @@ exports.run = async (bot, message, args) => {
                     ));
                 let trelloLink = db.fetch(`reports.${number}.trello`) || "https://trello.com/b/1SH81YNK/";
 
+                const verifiedBugs = db.fetch(`users.${user}.reportsVerifiedCount`);
+
+                if(verifiedBugs === 5){
+                    let role = message.guild.roles.cache.find(role => role.name === "Detektyw");
+                    if(!message.guild.members.cache.get(user)) return;
+                    message.guild.members.cache.get(user).roles.add(role.id);
+
+                    message.guild.members.cache.get(bugOwner).send(`Gratulujemy! Za zgłoszenie 5 prawdziwych błędów otrzymujesz rolę **Detektyw**`);
+                } else if(verifiedBugs === 15) {
+                    let role = message.guild.roles.cache.find(role => role.name === "Wykrywacz");
+                    if(!message.guild.members.cache.get(user)) return;
+                    message.guild.members.cache.get(user).roles.add(role.id);
+
+                    message.guild.members.cache.get(bugOwner).send(`Gratulujemy! Za zgłoszenie 15 prawdziwych błędów otrzymujesz rolę **Wykrywacz**`);
+                } else if(verifiedBugs === 30) {
+                    let role = message.guild.roles.cache.find(role => role.name === "Terminator");
+                    if(!message.guild.members.cache.get(user)) return;
+                    message.guild.members.cache.get(user).roles.add(role.id);
+
+                    message.guild.members.cache.get(bugOwner).send(`Gratulujemy! Za zgłoszenie 30 prawdziwych błędów otrzymujesz rolę **Terminator**`);
+                }
 
                 message.guild.members.cache.get(bugOwner).send(
                     "Twój błąd **" + bugDescription + "** ``" + `(#${number})` +
                     "`` został zaakceptowany! Dziękujemy za twoje zgłoszenie." +
                     "🖇️ **Trello Link: <" + trelloLink + ">**"
                 )
-
-                let role = message.guild.roles.cache.find(role => role.name === "Bug Hunter");
-                if(!message.guild.members.cache.get(user)) return;
-                message.guild.members.cache.get(user).roles.add(role.id);
-            }, 10000);
+            }, 8000);
         }
     }catch(error) {
-        console.error(error);
-        const msg = await message.reply("**Coś poszło nie tak!** Skontaktuj się z administracją.");
-        setTimeout(function(){
-            msg.delete();
-            message.delete();
-        }, 5000);
+        //
     }
 }
 
