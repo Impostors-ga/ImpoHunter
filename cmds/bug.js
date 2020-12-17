@@ -40,16 +40,17 @@ exports.run = async (bot, message, args) => {
     number = ans;
 
 
-    bot.guilds.cache.get(process.env.GUILDID).channels.cache.get(api.channels.approvalChannel).send(
-        "───────────────────\n" +
-        "**Zgłoszenie " + message.author.tag + "**:\n\n" +
-        "**Usługa:** " + reportPer + "\n" +
+    const bugEmbed = new Discord.MessageEmbed()
+        .setAuthor(bot.user.username,  bot.user.displayAvatarURL({format: 'jpg', size: 64, dynamic: true}))
+        .setTitle(`Zgłoszenie ${message.author.tag} ID: \`#${number}\``)
+        .setThumbnail(message.author.displayAvatarURL({format: 'jpg', size: 256, dynamic: true}))
+        .setDescription("**Usługa:** " + reportPer + "\n" +
         "**Opis:** " + bugArgs[1] + "\n" +
         "**Jak powtórzyć błąd:** " + reproList +
         "**Końcowy wynik:** " + bugArgs[3] + "\n" +
-        "**Informacje systemowe oraz aplikacji:** " + bugArgs[4] + "\n" +
-        `**ID zgłoszenia:** *#${number}*\n\n`
-    ).then(msg => {
+        "**Informacje systemowe oraz aplikacji:** " + bugArgs[4])
+        .setTimestamp(new Date());
+    bot.guilds.cache.get(process.env.GUILDID).channels.cache.get(api.channels.approvalChannel).send(bugEmbed).then(msg => {
         db.set(`reports.${number}.user`, message.author.id);
         db.set(`reports.${number}.user_tag`, message.author.tag);
         db.set(`reports.${number}.message_id`, msg.id);
@@ -61,11 +62,13 @@ exports.run = async (bot, message, args) => {
         db.set(`reports.${number}.settings`, bugArgs[4]);
         db.set(`reports.${number}.status`, 0);
         db.set(`reports.${number}.creationTimestamp`, Date.now());
-
-
-        db.set(`reports.${number}.reports.count`, 0);
-
-        console.log(db.fetch(`reports.${number}`));
+        if(!db.get(`users.${message.author.id}`)){
+            db.set(`users.${message.author.id}.reportsCount`, 0);
+            db.set(`users.${message.author.id}.reportApproveCount`, 0);
+            db.set(`users.${message.author.id}.reportRejectCount`, 0);
+        }
+        db.set(`users.${message.author.id}.reportId`, number);
+        db.set(`users.${message.author.id}.reportsCount`, db.get(`users.${message.author.id}.reportsCount`)+1);
     });
 
 

@@ -8,8 +8,9 @@ global.api = {};
 
 api.channels = {};
 
-api.channels.approvalChannel = "788760466830393375";
-api.channels.logsChannel = "784426453244182548";
+api.channels.approvalChannel = process.env.APPROVECHANNEL;
+api.channels.logsChannel = process.env.LOGSCHANNEL;
+api.channels.reportChannel = process.env.REPORTCHANNEL;
 
 api.enum = {};
 api.enum.status = {
@@ -98,7 +99,7 @@ fs.readdir("./cmds/", (err, files) => {
 
 bot.on('ready', async () => {
     console.log(`Logged in as ${bot.user.tag}`);//:)
-    const stats = [{name: "Szukaniu błędów gry :)", type: "COMPETING"}, {name: "impostors.ga", type: "WATCHING"}];
+    const stats = [{name: "Szukaniu błędów gry :)", type: "COMPETING"}, {name: "impostors.ga", type: "COMPETING"}];
 
     const index = Math.floor(Math.random() * (stats.length - 1) + 1);
     await bot.user.setActivity(stats[index].name, {type: stats[index].type});
@@ -114,10 +115,9 @@ bot.on("message", msg => {
     if (msg.author.bot) return;
     if (msg.channel.type === "dm") return;
 
-    if(msg.channel.id !== "788739144452931585" && msg.channel.id !== api.channels.approvalChannel && msg.channel.id !== api.channels.logsChannel){ // #boty
+    if(msg.channel.id !== api.channels.reportChannel && msg.channel.id !== api.channels.approvalChannel && msg.channel.id !== api.channels.logsChannel){ // #boty
         return;
     }
-
     if (!msg.content.startsWith(prefix)) return;
     let msgArray = msg.content.split(" ");
     let cmd = msgArray[0].toLocaleLowerCase();
@@ -128,6 +128,7 @@ bot.on("message", msg => {
         cmdfile.run(bot, msg, args);
     } else return;
 });
+
 
 bot.on('error', console.error);
 bot.on('guildMemberRemove', member => {

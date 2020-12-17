@@ -58,17 +58,29 @@ exports.run = async (bot, message, args) => {
 
 
         if(reportCount === 0) {
-            msg.edit(msg.content + "\n\n" +
-                ":-1: **" + message.author.tag + "**:" +
-                "`" + reason[1] + "`"
-
-            );
+            const embed = msg.embeds[0];
+            if(embed.fields.length>0){
+                let a = embed.fields[0].value;
+                embed.spliceFields(0, 1);
+                embed.addField("Zadeklarował", a+"\n⛔ "+message.author.tag+": "+reason[1]);
+            }else{
+                embed.addField("Zadeklarował", "⛔ "+message.author.tag+": "+reason[1]);
+            }
+            embed.setFooter("\u200B\n✅ - Występuje\n⛔ - Nie występuje");
+            embed.setColor("CYAN");
+            msg.edit(embed);
         } else {
-            msg.edit(msg.content + "\n" +
-                ":-1: **" + message.author.tag + "**:" +
-                "`" + reason[1] + "`"
-
-            );
+            const embed = msg.embeds[0];
+            if(embed.fields.length>0){
+                let a = embed.fields[0].value;
+                embed.spliceFields(0, 1);
+                embed.addField("Zadeklarował/a", a+"\n⛔ "+message.author.tag+": "+reason[1]);
+            }else{
+                embed.addField("Zadeklarował/a", "⛔ "+message.author.tag+": "+reason[1]);
+            }
+            embed.setFooter("\u200B\n✅ - Występuje\n⛔ - Nie występuje");
+            embed.setColor("CYAN");
+            msg.edit(embed);
         }
 
         let selfCount = db.fetch(`reports.${number}.rep.count`) || 0;
@@ -82,7 +94,7 @@ exports.run = async (bot, message, args) => {
         db.set(`reports.${number}.reports.${message.author.id}.content`, reason[1]);
         db.set(`reports.${number}.reports.${message.author.id}.rep`, selfCount+1);
         db.set(`reports.${number}.reports.reported.${message.author.id}`, "deny");
-
+        db.set(`users.${message.author.id}.reportRejectCount`, db.get(`users.${message.author.id}.reportRejectCount`)+1);
         const r = await message.reply("To zgłoszenie zostało **odrzucone**!");
         setTimeout(function(){
             r.delete()
