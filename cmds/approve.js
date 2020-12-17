@@ -74,9 +74,9 @@ exports.run = async (bot, message, args) => {
             if(embed.fields.length>0){
                 let a = embed.fields[0].value;
                 embed.spliceFields(0, 1);
-                embed.addField("Zadeklarował/a", a+"\n✅ "+message.author.tag+":"+reason[1]);
+                embed.addField("Zadeklarował/a", a+"\n✅ "+message.author.tag+": "+reason[1]);
             }else{
-                embed.addField("Zadeklarował/a", "✅ "+message.author.tag+":"+reason[1]);
+                embed.addField("Zadeklarował/a", "✅ "+message.author.tag+": "+reason[1]);
             }
             embed.setFooter("✅ - Występuje\n⛔ - Nie występuje");
             embed.setColor("CYAN");
@@ -124,7 +124,7 @@ exports.run = async (bot, message, args) => {
 
             await api.sendTrello(number, user_tag, service, description, reproduce, result, settings);
 
-            const msg = await message.channel.messages.fetch(message_id);
+            const msg = await bot.guilds.cache.get(process.env.GUILDID).channels.cache.get(api.channels.approvalChannel).messages.fetch(message_id);
             const delMsg = await message.channel.send("**Zgłoszenie *#" + number + "* zostało zaakceptowane:** ```" +
                 db.fetch(`reports.${number}.reports.approve.${argTo[0]}.user_tag`) + ": " + db.fetch(`reports.${number}.reports.approve.${argTo[0]}.content`) + "\n" +
                 db.fetch(`reports.${number}.reports.approve.${argTo[1]}.user_tag`) + ": " + db.fetch(`reports.${number}.reports.approve.${argTo[1]}.content`) + "\n" +
@@ -145,7 +145,7 @@ exports.run = async (bot, message, args) => {
                 "**Informacje systemowe oraz aplikacji:** " + settings
             );
 
-            let reactMessage = await bot.guilds.cache.get(process.env.GUILDID).channels.cache.get(api.channels.approvalChannel).messages.fetch(mess.id);
+            let reactMessage = await bot.guilds.cache.get(process.env.GUILDID).channels.cache.get(api.channels.logsChannel).messages.fetch(mess.id);
 
             setTimeout(function(){
 
@@ -167,8 +167,8 @@ exports.run = async (bot, message, args) => {
                     "🖇️ **Trello Link: <" + trelloLink + ">**"
                 )
 
-                let role = message.guild.roles.find(role => role.name === "Bug Hunter");
-                if(!message.guild.members.get(user)) return;
+                let role = message.guild.roles.cache.find(role => role.name === "Bug Hunter");
+                if(!message.guild.members.cache.get(user)) return;
                 message.guild.members.cache.get(user).roles.add(role.id);
             }, 10000);
         }

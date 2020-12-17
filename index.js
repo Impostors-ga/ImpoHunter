@@ -21,7 +21,7 @@ api.enum.status = {
     4: "Błąd znany oraz zgłoszony wcześniej",
 }
 
-api.toReport = 2;
+api.toReport = 6;
 
 api.sendTrello = async (number, user_tag, service, description, reproduce, result, settings) =>  {
     const yourApiKey = process.env.APIKEY;
@@ -70,8 +70,8 @@ api.sendTrello = async (number, user_tag, service, description, reproduce, resul
             });
         }
     });
-    console.log(`https://api.trello.com/1/cards?name=${description}&desc=${bug_all}&pos=top&idList=${listID}&keepFromSource=all&key=${yourApiKey}&token=${yourApiToken}`);
-    xhr.open("POST", `https://api.trello.com/1/cards?name=${description}&desc=${bug_all}&pos=top&idList=${listID}&keepFromSource=all&key=${yourApiKey}&token=${yourApiToken}`);
+    console.log(`https://api.trello.com/1/cards?name=${encodeURI(description)}&desc=${encodeURI(bug_all)}&pos=top&idList=${encodeURI(listID)}&keepFromSource=all&key=${encodeURI(yourApiKey)}&token=${encodeURI(yourApiToken)}`);
+    xhr.open("POST", `https://api.trello.com/1/cards?name=${encodeURI(description)}&desc=${encodeURI(bug_all)}&pos=top&idList=${encodeURI(listID)}&keepFromSource=all&key=${encodeURI(yourApiKey)}&token=${encodeURI(yourApiToken)}`);
 
     xhr.send(data);
 };
