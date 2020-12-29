@@ -2,20 +2,9 @@ const Discord = require('discord.js');
 const db = require("quick.db");
 exports.run = async (bot, message, args) => {
     let number = args[0];
-    let reason = message.content.split(" | ");
-
-    if(message.member.roles.cache.filter(x => x.name.toLowerCase() === "community manager" || x.name.toLowerCase() === "developer" || x.name.toLowerCase() === "administrator")) {
+    if(!!message.member.roles.cache.find(x => x.name.toLowerCase() === "community manager" || x.name.toLowerCase() === "developer" || x.name.toLowerCase() === "administrator")) {
         if (!number) {
             const r = await message.reply("Musisz podać **ID zgłoszenia**.");
-            setTimeout(function () {
-                r.delete()
-                message.delete()
-            }, 10000);
-            return;
-        }
-
-        if (!reason[1]) {
-            const r = await message.reply("Podaj informacje systemowe oraz aplikacji.");
             setTimeout(function () {
                 r.delete()
                 message.delete()
@@ -43,19 +32,21 @@ exports.run = async (bot, message, args) => {
             return;
         }
 
+        console.log(0);
+
         let message_id = db.fetch(`reports.${number}.message_id`);
         try {
-            let msg = await bot.guilds.cache.get(process.env.GUILDID).channels.cache.get(api.channels.approvalChannel).messages.fetch(message_id);
             let selfCount = db.fetch(`reports.${number}.rep.count`) || 0;
+            console.log(1);
 
             db.add(`reports.${number}.rep.count`, 1);
             db.add(`reports.${number}.reports.count`, 1);
             db.add(`reports.${number}.reports.approve.count`, 1);
-            db.set(`reports.${number}.reports.${message.author.id}.reportCount`, reportCount + 1);
+            db.set(`reports.${number}.reports.${message.author.id}.reportCount`, 5);
             db.set(`reports.${number}.reports.approve.${selfCount + 1}.user`, message.author.id);
             db.set(`reports.${number}.reports.approve.${selfCount + 1}.user_tag`, message.author.tag);
-            db.set(`reports.${number}.reports.approve.${selfCount + 1}.content`, reason[1]);
-            db.set(`reports.${number}.reports.${message.author.id}.content`, reason[1]);
+            db.set(`reports.${number}.reports.approve.${selfCount + 1}.content`, "ForceApproved");
+            db.set(`reports.${number}.reports.${message.author.id}.content`, "ForceApproved");
             db.set(`reports.${number}.reports.${message.author.id}.rep`, selfCount + 1);
             db.set(`reports.${number}.reports.reported.${message.author.id}`, "approve");
             db.set(`users.${message.author.id}.reportApproveCount`, db.get(`users.${message.author.id}.reportApproveCount`) + 1);
